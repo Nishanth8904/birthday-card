@@ -78,7 +78,7 @@ const SmallLetter = () => {
         >
             x
         </div>
-        <p>Yo brocaccho,<br /><br />Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud <br /><br />Rajib</p>
+        <p>Yo dumba**,<br /><br />Too much hardwork need moko taggit for the cause and domain vaanga kaasu illa <br /><br />Nishanth</p>
     </div>
 
     {/* --- NEW SVG DIARY PAGE DECORATION --- */}
