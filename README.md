@@ -24,7 +24,7 @@ A clean and interactive **Happy Birthday website** built with modern animations 
 
 ### 1. Clone the Repository
 ```bash
-git clone https://github.com/Munna-Scriptz/Happy-Birthday.git
+git clone https://github.com/Nishanth8904/birthday-card)
 ````
 
 ### 2. Open the Project
@@ -42,7 +42,7 @@ Run `npm run dev` in your Terminal — you’re good to go.
 I wanted to create a **unique birthday experience** using animations, transitions, and interactive UI elements — something fun, personal, and visually satisfying.
 Feel free to use it, customize it, or improve it in your own style.
 
-Made with ❤️ by **Munna-Scriptz**
+Made with ❤️ by 
 
 ---
 
