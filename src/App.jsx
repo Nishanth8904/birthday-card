@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import LoveLetter from './pages/LoveLetter'
 import Test from './pages/Test'
 import OpeningAnimation from './components/OpeningAnimation'
+import { Analytics } from '@vercel/analytics/react'
 
 const App = () => {
 
@@ -51,6 +52,7 @@ const App = () => {
       {
         showContent && <RouterProvider router={MyRoute} />
       }
+      <Analytics />
     </>
   )
 }
