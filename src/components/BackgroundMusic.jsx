@@ -7,6 +7,9 @@ const BackgroundMusic = () => {
   useEffect(() => {
     const handleFirstInteraction = () => {
       if (audioRef.current && !isPlaying) {
+        // Reset audio to the start before playing
+        audioRef.current.currentTime = 0;
+        
         audioRef.current.play()
           .then(() => {
             setIsPlaying(true);
@@ -35,6 +38,8 @@ const BackgroundMusic = () => {
       audioRef.current.pause();
       setIsPlaying(false);
     } else {
+      // Reset audio to the start when toggled back on
+      audioRef.current.currentTime = 0;
       audioRef.current.play().then(() => setIsPlaying(true));
     }
   };

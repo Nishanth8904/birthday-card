@@ -7,8 +7,9 @@ const Layout = () => {
   return (
     <>
         <HeartTransition />
-        <Outlet />
         <BackgroundMusic/>
+        <Outlet />
+        
     </>
   )
 }
