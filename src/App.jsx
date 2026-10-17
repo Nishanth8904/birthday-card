@@ -8,6 +8,7 @@ import Home from './pages/Home'
 import LoveLetter from './pages/LoveLetter'
 import Test from './pages/Test'
 import OpeningAnimation from './components/OpeningAnimation'
+import FunkoRunner from './components/FunkoRunner' // 1. Import your FunkoRunner component
 import { Analytics } from '@vercel/analytics/react'
 
 const App = () => {
@@ -50,7 +51,13 @@ const App = () => {
         loading && <OpeningAnimation animateOut={animateOut}/>
       }
       {
-        showContent && <RouterProvider router={MyRoute} />
+        showContent && (
+          <>
+            <RouterProvider router={MyRoute} />
+            {/* 2. Funko Runner renders at the bottom once content shows up */}
+            <FunkoRunner />
+          </>
+        )
       }
       <Analytics />
     </>
