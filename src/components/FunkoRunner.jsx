@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // Ground covered by the body during one leg's stance phase (px).
 // Leg length (~34px on screen) x sin(30deg) x 2. Tying the gait speed to this
@@ -10,6 +10,11 @@ const FunkoRunner = () => {
   const [direction, setDirection] = useState('normal'); // 'normal' or 'reverse'
   const [isPaused, setIsPaused] = useState(false);
   const [hidden, setHidden] = useState(false);
+  // Bouquet hand-over: 'idle' -> 'flying' -> 'delivered' -> 'idle'
+  const [phase, setPhase] = useState('idle');
+  const [arrived, setArrived] = useState(false);
+  const [flyStart, setFlyStart] = useState(null);
+  const spriteRef = useRef(null);
   const [vw, setVw] = useState(typeof window !== 'undefined' ? window.innerWidth : 1200);
 
   useEffect(() => {
@@ -18,8 +23,40 @@ const FunkoRunner = () => {
     return () => window.removeEventListener('resize', onResize);
   }, []);
 
+  // Drives the bouquet flying toward the viewer
+  useEffect(() => {
+    if (phase !== 'flying') return;
+    let raf2;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => setArrived(true));
+    });
+    const t = setTimeout(() => setPhase('delivered'), 1400);
+    return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+      clearTimeout(t);
+    };
+  }, [phase]);
+
+  const handleCharacterClick = () => {
+    if (phase !== 'idle' || !spriteRef.current) return;
+    const r = spriteRef.current.getBoundingClientRect();
+    // Bouquet is drawn at ~59..139px (x) and 16..118px (y) inside the 150px sprite
+    const left = r.left + (direction === 'normal' ? 59 : 150 - 139);
+    const top = r.top + 16;
+    setFlyStart({ left, top });
+    setArrived(false);
+    setPhase('flying');
+  };
+
+  const handleThanks = () => {
+    setPhase('idle');
+    setArrived(false);
+  };
+
   const isMovingRight = direction === 'normal';
-  const play = isPaused ? 'paused' : 'running';
+  // Character stands still while handing over the bouquet
+  const play = isPaused || phase !== 'idle' ? 'paused' : 'running';
 
   const crossTime = (vw + 180) / speed; // seconds to cross the screen
   const cycle = (2 * STEP_PX) / speed;  // seconds per full gait cycle (2 steps)
@@ -176,7 +213,21 @@ const FunkoRunner = () => {
       <div style={trackStyle} />
 
       {/* Character container: sits on the bottom edge of the page */}
-      <div className="funko-sprinter" style={{ position: 'absolute', bottom: '2px', left: 0, width: '150px', height: '141px' }}>
+      <div
+        ref={spriteRef}
+        className="funko-sprinter"
+        onClick={handleCharacterClick}
+        title="Click me!"
+        style={{
+          position: 'absolute',
+          bottom: '2px',
+          left: 0,
+          width: '150px',
+          height: '141px',
+          pointerEvents: phase === 'idle' ? 'auto' : 'none',
+          cursor: 'pointer',
+        }}
+      >
         <div className="funko-flipper">
           <div className="funko-body-bob">
 
@@ -251,21 +302,72 @@ const FunkoRunner = () => {
                 <path d="M 44 55 Q 50 60 56 55" stroke="#1c1917" strokeWidth="2" strokeLinecap="round" fill="none" />
               </g>
 
-              {/* BOUQUET HELD IN FRONT */}
-              <image
-                href="/bouquet.png"
-                x="55"
-                y="15"
-                width="75"
-                height="95"
-                preserveAspectRatio="xMidYMid meet"
-              />
+              {/* BOUQUET HELD IN FRONT (leaves his hand when given) */}
+              {phase === 'idle' && (
+                <image
+                  href="/bouquet.png"
+                  x="55"
+                  y="15"
+                  width="75"
+                  height="95"
+                  preserveAspectRatio="xMidYMid meet"
+                />
+              )}
 
             </svg>
 
           </div>
         </div>
       </div>
+
+      {/* Bouquet flying from his hand to the middle of the screen */}
+      {phase !== 'idle' && flyStart && (
+        <img
+          src="/bouquet.png"
+          alt="Bouquet"
+          style={{
+            position: 'fixed',
+            left: flyStart.left,
+            top: flyStart.top,
+            width: 80,
+            height: 102,
+            objectFit: 'contain',
+            zIndex: 1000001,
+            pointerEvents: 'none',
+            transformOrigin: 'center center',
+            transition: 'transform 1.3s cubic-bezier(0.22, 1, 0.36, 1)',
+            transform: arrived
+              ? `translate(${vw / 2 - (flyStart.left + 40)}px, ${window.innerHeight / 2 - 40 - (flyStart.top + 51)}px) scale(2.6) rotate(-6deg)`
+              : 'translate(0px, 0px) scale(1) rotate(0deg)',
+          }}
+        />
+      )}
+
+      {phase === 'delivered' && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 'calc(50% + 110px)',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            zIndex: 1000002,
+            pointerEvents: 'auto',
+            textAlign: 'center',
+            background: 'rgba(255, 255, 255, 0.95)',
+            border: '1px solid #ffd1dc',
+            borderRadius: '16px',
+            padding: '10px 18px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+          }}
+        >
+          <div style={{ fontSize: '16px', fontWeight: 'bold', color: '#ff4d6d', marginBottom: '8px' }}>
+            💐 This is for you!
+          </div>
+          <button onClick={handleThanks} style={btnStyle}>
+            Thank you 💖
+          </button>
+        </div>
+      )}
     </div>
   );
 };
